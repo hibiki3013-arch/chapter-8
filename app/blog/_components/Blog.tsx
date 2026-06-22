@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Link  from 'next/link';
 import styles from './Blog.module.css';
 import { type Post } from '../../_types/post';
+import { formatDate } from '../../_utils/Date';
+
 export default function Blog() {
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true)
@@ -35,8 +37,7 @@ export default function Blog() {
     return(
 <div className={styles.PostCardMain}>
     {posts.map((post) => {
-      const [year, month, day] = post.createdAt.split('T')[0].split('-');
-      const formattedDate = `${year}年${month}月${day}日`;
+      const formattedDate = formatDate(post.createdAt);
        return (
 
 

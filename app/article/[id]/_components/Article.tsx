@@ -4,6 +4,7 @@ import {useState, useEffect} from 'react';
 import styles from './Article.module.css';
 import { type Post } from '../../../_types/post';
 import Image from 'next/image';
+import { formatDate } from '../../../_utils/Date';
 
 export default function Article({id}: {id: string}) {
 
@@ -35,8 +36,7 @@ export default function Article({id}: {id: string}) {
     return <div>記事が見つかりませんでした。</div>;
   }
 
-  const [year, month, day] = post.createdAt ? post.createdAt.split('T')[0].split('-') : ['----', '--', '--'];
-  const formattedDate = `${year}/${month}/${day}`;
+  const formattedDate = formatDate(post.createdAt);
   
    return(
     <div>
