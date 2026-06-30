@@ -1,21 +1,25 @@
 "use client"
 
+
 import { useState, useEffect } from 'react';
 import Link  from 'next/link';
 import styles from './Blog.module.css';
-import { type Post } from '../../_types/post';
-import { formatDate } from '../../_utils/Date';
-
+import { type MicroCmsPost } from '../../_types/MicroCmsPost';
 export default function Blog() {
-    const [posts, setPosts] = useState<Post[]>([]);
+    const [posts, setPosts] = useState<MicroCmsPost[]>([]);
     const [loading, setLoading] = useState(true)
+
 
     useEffect(() => {
     const fetcher = async () => {
       try{
-      const res = await fetch("https://1hmfpsvto6.execute-api.ap-northeast-1.amazonaws.com/dev/posts")
+      const res = await fetch("https://bd5itciz1l.microcms.io/api/v1/posts",{  
+        headers: {
+          'X-MICROCMS-API-KEY': 'G5ORi2gK4GJ3YfHhz73GuNNBSRvtB682CEbT',
+        },
+      })
       const data = await res.json();
-      setPosts(data.posts);
+      setPosts(data.contents);
     }catch (error) {
       console.error("データの取得に失敗しました:", error);
     }finally {
@@ -23,43 +27,54 @@ export default function Blog() {
     }
   };
 
+
     fetcher();
   }, []);
+
 
   if (loading) {
     return <div>読み込み中...</div>;
   }
 
+
     if (posts.length === 0) {
     return <div>記事がありません。</div>;
   }
 
+
     return(
 <div className={styles.PostCardMain}>
     {posts.map((post) => {
-      const formattedDate = formatDate(post.createdAt);
+      const [year, month, day] = post.createdAt.split('T')[0].split('-');
+      const formattedDate = `${year}年${month}月${day}日`;
        return (
+
+
 
 
       <Link href={`/article/${post.id}`}  key={post.id} className={styles.PostCard}>
 
-        
-      <div className={styles.PostCardBetween}> 
+
+       
+      <div className={styles.PostCardBetween}>
         <div className={styles.PostCardData}>{formattedDate}</div>
+
 
         <div className={styles.PostCardCategory}>
         {post.categories.map((category, index) => {
           return(
-            <span key={index} className={styles.CategoryDetail}>{category}</span>
+            <span key={index} className={styles.CategoryDetail}>{category.name}</span>
           )
         }
       )}
       </div>
       </div>
 
+
       <div className={styles.PostCardTitle}>
         APIで取得した{post.title}
       </div>
+
 
       <div className={styles.PostCardArticle} dangerouslySetInnerHTML={{ __html: post.content }} />
       </Link>
