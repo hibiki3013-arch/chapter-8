@@ -2,30 +2,34 @@
 
 import {useState, useEffect} from 'react';
 import styles from './Article.module.css';
-import { type Post } from '../../../_types/post';
+import { type MicroCmsPost } from '../../../_types/MicroCmsPost';
 import Image from 'next/image';
 
 export default function Article({id}: {id: string}) {
 
-  const [post, setPost] = useState<Post | null>(null);
+  const [post, setPost] = useState<MicroCmsPost | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPostDetail = async () => {
-      try {
-        const res = await fetch(`https://1hmfpsvto6.execute-api.ap-northeast-1.amazonaws.com/dev/posts/${id}`);
-        const data = await res.json();
+    const fetcher = async () => {
+      try{
+      const res = await fetch(`https://bd5itciz1l.microcms.io/api/v1/posts/${id}`, {
+        headers: {
+          'X-MICROCMS-API-KEY': 'G5ORi2gK4GJ3YfHhz73GuNNBSRvtB682CEbT'
+        }
+        });
 
-        setPost(data.post); 
-      } catch (error) {
-        console.error("詳細記事の取得に失敗しました:", error);
-      } finally {
-        setLoading(false);
-      }
+      const data = await res.json()
+      setPost(data);
+    }catch(error) {
+      console.error("データの取得に失敗しました:", error);
+    }finally {
+      setLoading(false);
+    }
     };
 
-    fetchPostDetail();
-  }, [id]); 
+    fetcher();
+  }, [id]);
 
   if (loading) {
     return <div>記事を読み込み中...</div>;
@@ -40,7 +44,7 @@ export default function Article({id}: {id: string}) {
   
    return(
     <div>
-    <Image src="https://placehold.jp/800x400.png"  alt="記事の画像" width={800} height={400} className={styles.Img} priority unoptimized/>
+    <Image src={post.thumbnail?.url ?? 'https://placehold.jp/800x400.png'} alt="記事の画像" width={800} height={400} className={styles.Img} priority unoptimized/>
 
       <div key={post.id} className={styles.PostCard}>
 
@@ -50,7 +54,7 @@ export default function Article({id}: {id: string}) {
         <div className={styles.PostCardCategory}>
         {post.categories.map((category, index) => {
           return(
-            <span key={index} className={styles.CategoryDetail}>{category}</span>
+            <span key={index} className={styles.CategoryDetail}>{category.name}</span>
           )
         }
       )}
